@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  postgres:
+    image: postgres:11
+    container_name: db
+    ports:
+      - 5432:5432
+    volumes:
+      - ./initdb/scripts:/docker-entrypoint-initdb.d
+      - ./initdb/csv:/tmp
+    environment:
+      POSTGRES_DB: devdb
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: password
