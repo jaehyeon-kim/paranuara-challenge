@@ -1,36 +1,47 @@
 from typing import List
-from pydantic import BaseModel, Fields
+from pydantic import BaseModel
 
 
-class ItemBase(BaseModel):
-    title: str
-    description: str = None
-
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
+class EmployeeFeature(BaseModel):
     id: int
-    owner_id: int
+    employee_id: int
+
+
+class FavouriteFood(EmployeeFeature):
+    name: str
 
     class Config:
         orm_mode = True
 
 
-class UserBase(BaseModel):
-    email: str
+class Friends(EmployeeFeature):
+    friend_id: int
+
+    class Config:
+        orm_mode = True
 
 
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
+class IdNamePair(BaseModel):
     id: int
-    is_active: bool
-    items: List[Item] = []
+    name: str
+
+
+class Employee(IdNamePair):
+    age: int
+    address: str
+    phone: str
+    eye_colour: str
+    has_died: bool
+    company_id: int
+    favouriteFood: List[FavouriteFood] = []
+    friends: List[Friends] = []
+
+    class Config:
+        orm_mode = True
+
+
+class Company(IdNamePair):
+    employees: List[Employee] = []
 
     class Config:
         orm_mode = True

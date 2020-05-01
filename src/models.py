@@ -16,8 +16,8 @@ class Employee(Base):
     has_died = Column(Boolean)
     company_id = Column(Integer, ForeignKey("companies.id"))
 
-    favourite_food = relationship("FavouriteFood", backref="favourite_food")
-    friends = relationship("Friend", backref="friends")
+    favourite_food = relationship("FavouriteFood", backref="favourite_food_ref")
+    friends = relationship("Friend", backref="friends_ref")
 
 
 class Company(Base):
@@ -26,7 +26,7 @@ class Company(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
 
-    employees = relationship("Employee", backref="employees")
+    employees = relationship("Employee", backref="employees_ref")
 
 
 class FavouriteFood(Base):

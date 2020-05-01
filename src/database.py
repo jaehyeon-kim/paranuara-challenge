@@ -1,4 +1,5 @@
 import os
+from sqlalchemy import inspect
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -18,4 +19,13 @@ SQLALCHEMY_DATABASE_URL = "postgresql://{}:{}@{}:5432/{}".format(
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+
+class Base:
+    def _asdict(self):
+        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
+
+    def __repr__(self):
+        return str(self._asdict())
+
+
+Base = declarative_base(cls=Base)
