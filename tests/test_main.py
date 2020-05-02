@@ -1,6 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
+
 from main import app
+from src.crud import FOOD_GROUPS, get_intersection
 
 client = TestClient(app)
 
@@ -59,7 +61,20 @@ def test_get_employee_relation(test_input):
     )
     assert resp.status_code == test_input["status_code"], resp.text
 
-    # TODO: check logic if 200
+    if resp.status_code == 200:
+        data = resp.json()
+        friend_ids = get_intersection(
+            [e["friend_id"] for e in data["first_employee"]["friends"]],
+            [e["friend_id"] for e in data["second_employee"]["friends"]],
+        )
+        assert all(
+            map(
+                lambda x: x["id"] in friend_ids
+                and x["eye_colour"] == "brown"
+                and x["has_died"] == False,
+                data["friends"],
+            )
+        )
 
 
 @pytest.mark.parametrize(
@@ -74,4 +89,11 @@ def test_get_employee_food(test_input):
     resp = client.get(f"/employee/{test_input['employee_id']}/favourite_food")
     assert resp.status_code == test_input["status_code"], resp.text
 
-    # TODO: check logic if 200
+    if resp.status_code == 200:
+
+        def match_group(data, which="fruits"):
+            return all(map(lambda x: x in FOOD_GROUPS[which], data[which]))
+
+        data = resp.json()
+        assert match_group(data, "fruits")
+        assert match_group(data, "vegetables")
