@@ -13,7 +13,7 @@ services:
       - POSTGRES_USER=devuser
       - POSTGRES_PASSWORD=password
   test:
-    image: paranuara-challenge
+    image: jaehyeon/paranuara-challenge
     container_name: api-test
     depends_on:
       - postgres
