@@ -59,6 +59,8 @@ def test_get_employee_relation(test_input):
     )
     assert resp.status_code == test_input["status_code"], resp.text
 
+    # TODO: check logic if 200
+
 
 @pytest.mark.parametrize(
     "test_input",
@@ -71,3 +73,5 @@ def test_get_employee_relation(test_input):
 def test_get_employee_food(test_input):
     resp = client.get(f"/employee/{test_input['employee_id']}/favourite_food")
     assert resp.status_code == test_input["status_code"], resp.text
+
+    # TODO: check logic if 200
