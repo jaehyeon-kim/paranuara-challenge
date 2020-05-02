@@ -2,46 +2,63 @@ from typing import List
 from pydantic import BaseModel
 
 
-class EmployeeFeature(BaseModel):
+class IdName(BaseModel):
+    id: int
+    name: str
+
+
+class Company(BaseModel):
+    companies: List[IdName]
+    skip: int
+    limit: int
+    total: int
+
+
+class FeatureBase(BaseModel):
     id: int
     employee_id: int
 
 
-class FavouriteFood(EmployeeFeature):
+class FavouriteFood(FeatureBase):
     name: str
 
     class Config:
         orm_mode = True
 
 
-class Friends(EmployeeFeature):
+class Friends(FeatureBase):
     friend_id: int
 
     class Config:
         orm_mode = True
 
 
-class IdNamePair(BaseModel):
-    id: int
-    name: str
-
-
-class Employee(IdNamePair):
+class Employee(IdName):
     age: int
     address: str
     phone: str
     eye_colour: str
     has_died: bool
     company_id: int
-    favouriteFood: List[FavouriteFood] = []
+    favourite_food: List[FavouriteFood] = []
     friends: List[Friends] = []
 
     class Config:
         orm_mode = True
 
 
-class Company(IdNamePair):
-    employees: List[Employee] = []
+class EmployeeFriends(BaseModel):
+    first_employee: Employee
+    second_employee: Employee
+    friends: List[Employee]
 
-    class Config:
-        orm_mode = True
+
+class EmployeeFood(BaseModel):
+    username: str
+    age: int
+    fruits: List[str]
+    vegetables: List[str]
+
+
+class BasicError(BaseModel):
+    detail: str
