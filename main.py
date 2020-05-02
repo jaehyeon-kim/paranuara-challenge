@@ -3,10 +3,10 @@ from typing import List
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
-from src import models, schemas
+from src import crud, models, schemas
 from src.database import SessionLocal, engine
 
-app = FastAPI()
+app = FastAPI(title="Paranuara Challenge")
 
 # Dependency
 def get_db():
@@ -17,36 +17,51 @@ def get_db():
         db.close()
 
 
-def get_companies(db: Session):
-    return db.query(models.Company).filter(models.Company.id == 26).first()
-
-
-@app.get("/companies/", response_model=schemas.Company)
-def get_company(db: Session = Depends(get_db)):
-    db_users = get_companies(db)
+@app.get("/company/list/", response_model=schemas.Company, tags=["company"])
+def get_companies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+    db_users = crud.get_companies(db, skip, limit)
     return db_users
 
 
-# from sqlalchemy.orm import Session
-# from src import models, schemas, database
+@app.get(
+    "/company/{company_id}/employee",
+    response_model=List[schemas.Employee],
+    tags=["company"],
+    responses={404: {"model": schemas.BasicError}},
+)
+def get_company_employees(company_id: int, db: Session = Depends(get_db)):
+    employees = crud.get_company_employees(db, company_id)
+    if employees is None:
+        raise HTTPException(404, detail="company not found")
+    if employees == []:
+        raise HTTPException(404, detail="employees not found")
+    return employees
 
 
-# def get_companies(db: Session):
-#     return db.query(models.Company).first()
+@app.get(
+    "/employee/relation/",
+    response_model=schemas.EmployeeFriends,
+    tags=["employee"],
+    responses={404: {"model": schemas.BasicError}},
+)
+def get_employee_relation(
+    first_employee_id: int, second_employee_id: int, db: Session = Depends(get_db)
+):
+    employee_friends = crud.get_employee_relation(db, first_employee_id, second_employee_id)
+    if not employee_friends:
+        raise HTTPException(404, detail="one or more employees not found")
+    return employee_friends
 
 
-# get_companies(database.SessionLocal())
-
-# from src.database import SessionLocal
-# from src.models import Employee, Company
-# from sqlalchemy.orm import sessionmaker
-
-# session = SessionLocal()
-
-# e = session.query(Employee).first()
-# c = session.query(Company).first()
-
-# c.id
-
-# for instance in session.query(Company).first():
-#     print(instance.employees)
+@app.get(
+    "/employee/{employee_id}/food",
+    response_model=schemas.EmployeeFood,
+    tags=["employee"],
+    responses={404: {"model": schemas.BasicError}},
+)
+def get_employee_food(employee_id: int, db: Session = Depends(get_db)):
+    employee_food = crud.get_employee_food(db, employee_id)
+    print(employee_food)
+    if not employee_food:
+        raise HTTPException(404, detail="employee not found")
+    return employee_food
