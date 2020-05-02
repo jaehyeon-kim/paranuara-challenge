@@ -2,7 +2,7 @@ version: "3.7"
 services:
   postgres:
     image: postgres:11
-    container_name: db
+    container_name: db-test
     ports:
       - 5432:5432
     volumes:
@@ -12,18 +12,21 @@ services:
       - POSTGRES_DB=devdb
       - POSTGRES_USER=devuser
       - POSTGRES_PASSWORD=password
-  app:
+  test:
     image: paranuara-challenge
-    container_name: api
+    container_name: api-test
     depends_on:
       - postgres
+    entrypoint:
+      - python
     command: >
-      main:app
-      --host=0.0.0.0
-      --port=8000
-      --reload
-    ports:
-      - 8000:8000
+      -m 
+      pytest 
+      --cov=src 
+      --cov-report=term-missing 
+      --cov-config=.coveragerc 
+      tests/ 
+      -rsxv
     volumes:
       - ./:/home/app
     environment:
