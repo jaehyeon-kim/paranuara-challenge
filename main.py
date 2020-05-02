@@ -1,12 +1,21 @@
 from typing import List
-
 from fastapi import Depends, FastAPI, HTTPException, Query, Path
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from src import crud, models, schemas
 from src.database import SessionLocal, engine
 
 app = FastAPI(title="Paranuara Challenge")
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Dependency
 def get_db():
@@ -23,7 +32,11 @@ def get_db():
     tags=["company"],
     summary="Provide a list of companies - quick way to get company details",
 )
-def get_companies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+def get_companies(
+    skip: int = Query(0, ge=0, description="Non negative integer"),
+    limit: int = Query(50, ge=0, description="Non negative integer"),
+    db: Session = Depends(get_db),
+):
     db_users = crud.get_companies(db, skip, limit)
     return db_users
 
@@ -36,7 +49,7 @@ def get_companies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db))
     summary="Given a company, provide all the employees.",
 )
 def get_company_employees(
-    company_id: int = Path(..., ge=0, description="non negative integer"),
+    company_id: int = Path(..., ge=0, description="Non negative integer"),
     db: Session = Depends(get_db),
 ):
     employees = crud.get_company_employees(db, company_id)
@@ -55,8 +68,8 @@ def get_company_employees(
     summary="Given 2 people, provide their information and the list of their friends in common which have brown eyes and are still alive.",
 )
 def get_employee_relation(
-    first_employee_id: int = Query(..., ge=0, description="non negative integer"),
-    second_employee_id: int = Query(..., ge=0, description="non negative integer"),
+    first_employee_id: int = Query(..., ge=0, description="Non negative integer"),
+    second_employee_id: int = Query(..., ge=0, description="Non negative integer"),
     db: Session = Depends(get_db),
 ):
     employee_friends = crud.get_employee_relation(db, first_employee_id, second_employee_id)
@@ -73,11 +86,10 @@ def get_employee_relation(
     summary="Given 1 people, provide a list of fruits and vegetables they like.",
 )
 def get_employee_food(
-    employee_id: int = Path(..., ge=0, description="non negative integer"),
+    employee_id: int = Path(..., ge=0, description="Non negative integer"),
     db: Session = Depends(get_db),
 ):
     employee_food = crud.get_employee_food(db, employee_id)
-    print(employee_food)
     if not employee_food:
         raise HTTPException(404, detail="employee not found")
     return employee_food
