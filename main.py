@@ -54,7 +54,7 @@ def get_employee_relation(
 
 
 @app.get(
-    "/employee/{employee_id}/food",
+    "/employee/{employee_id}/favourite_food",
     response_model=schemas.EmployeeFood,
     tags=["employee"],
     responses={404: {"model": schemas.BasicError}},
