@@ -8,7 +8,7 @@ client = TestClient(app)
 
 
 def test_get_companies():
-    resp = client.get("/company/list", params={"skip": 0, "limit": 20})
+    resp = client.get("/company/list", params={"start_id": 0, "limit": 20})
     assert resp.status_code == 200, resp.text
 
     data = resp.json()

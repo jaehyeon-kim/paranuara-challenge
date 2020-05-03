@@ -9,8 +9,8 @@ class IdName(BaseModel):
 
 class Company(BaseModel):
     companies: List[IdName]
-    skip: int
-    limit: int
+    start_id: int = 0
+    limit: int = 50
     total: int
 
 

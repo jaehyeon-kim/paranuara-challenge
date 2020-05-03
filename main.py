@@ -33,11 +33,11 @@ def get_db():
     summary="Provide a list of companies - quick way to get company details",
 )
 def get_companies(
-    skip: int = Query(0, ge=0, description="Non negative integer"),
+    start_id: int = Query(0, ge=0, description="Non negative integer"),
     limit: int = Query(50, ge=0, description="Non negative integer"),
     db: Session = Depends(get_db),
 ):
-    db_users = crud.get_companies(db, skip, limit)
+    db_users = crud.get_companies(db, start_id, limit)
     return db_users
 
 

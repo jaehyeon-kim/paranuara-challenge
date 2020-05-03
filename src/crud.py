@@ -24,17 +24,17 @@ def get_num_companies(db: Session):
     return db.query(func.count(models.Company.id)).first()[0]
 
 
-def get_companies(db: Session, skip: int = 0, limit: int = 50):
+def get_companies(db: Session, start_id: int = 0, limit: int = 50):
     companies_info = (
         db.query(models.Company.id, models.Company.name)
+        .filter(models.Company.id >= start_id)
         .order_by(models.Company.id)
-        .offset(skip)
         .limit(limit)
         .all()
     )
     return {
         "companies": [{"id": info[0], "name": info[1]} for info in companies_info],
-        "skip": skip,
+        "start_id": start_id,
         "limit": limit,
         "total": get_num_companies(db),
     }
