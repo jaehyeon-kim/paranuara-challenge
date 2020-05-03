@@ -26,7 +26,11 @@ def get_num_companies(db: Session):
 
 def get_companies(db: Session, skip: int = 0, limit: int = 50):
     companies_info = (
-        db.query(models.Company.id, models.Company.name).offset(skip).limit(limit).all()
+        db.query(models.Company.id, models.Company.name)
+        .order_by(models.Company.id)
+        .offset(skip)
+        .limit(limit)
+        .all()
     )
     return {
         "companies": [{"id": info[0], "name": info[1]} for info in companies_info],
